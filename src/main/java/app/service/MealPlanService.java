@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.UUID;
+
 
 @Slf4j
 @Service
@@ -32,16 +34,31 @@ public class MealPlanService {
                 .plannedDate(request.getPlannedDate())
                 .calories(request.getCalories())
                 .recipeId(request.getRecipeId())
-                .deleted(false)
                 .build();
 
-        MealPlan saved = mealPlanRepository.save(mealPlan);
+        MealPlan savedMealPlan = mealPlanRepository.save(mealPlan);
 
         log.info("Added meal plan for user [{}]: {} on {}",
                 request.getUserId(), request.getMealName(), request.getPlannedDate());
 
 
-        return saved;
+        return savedMealPlan;
     }
+
+
+    public void deleteMealPlan(UUID mealPlanId, UUID userId) {
+        MealPlan mealPlan = mealPlanRepository.findById(mealPlanId)
+                .orElseThrow(() -> new RuntimeException("Meal plan not found"));
+
+        if (!mealPlan.getUserId().equals(userId)) {
+            throw new RuntimeException("You can only delete your own meal plans");
+        }
+
+        mealPlan.setDeleted(true);
+        mealPlanRepository.save(mealPlan);
+
+        log.info("Deleted meal plan [{}] for user [{}]", mealPlanId, userId);
+    }
+
 
 }

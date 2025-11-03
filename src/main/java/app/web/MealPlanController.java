@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 
 @Slf4j
 @RestController
@@ -33,6 +35,13 @@ public class MealPlanController {
         MealPlanResponse response = MealPlanMapper.toResponse(created);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
+    @DeleteMapping("/{mealPlanId}")
+    public ResponseEntity<Void> deleteMealPlan( @PathVariable UUID mealPlanId, @RequestParam UUID userId) {
+        mealPlanService.deleteMealPlan(mealPlanId, userId);
+        return ResponseEntity.noContent().build();
     }
 
 
