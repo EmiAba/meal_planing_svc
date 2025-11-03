@@ -12,5 +12,15 @@ import java.util.UUID;
 @Repository
 public interface MealPlanRepository extends JpaRepository<MealPlan, UUID> {
 
+    @Query("SELECT m FROM MealPlan m " +
+            "WHERE m.userId = :userId " +
+            "AND m.plannedDate BETWEEN :startDate AND :endDate " +
+            "AND m.deleted = false " +
+            "ORDER BY m.plannedDate, m.mealType")
+    List<MealPlan> findWeeklyPlans(
+            @Param("userId") UUID userId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 
     }

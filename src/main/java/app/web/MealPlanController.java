@@ -12,7 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -27,6 +30,20 @@ public class MealPlanController {
         this.mealPlanService = mealPlanService;
     }
 
+
+    @GetMapping("/weekly")
+    public ResponseEntity<List<MealPlanResponse>> getWeeklyMealPlans(
+            @RequestParam UUID userId,
+            @RequestParam LocalDate weekStart
+    ) {
+        List<MealPlan> weeklyPlans = mealPlanService.getWeeklyMealPlans(userId, weekStart);
+
+        List<MealPlanResponse> response = weeklyPlans.stream()
+                .map(MealPlanMapper::toResponse)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping
     public ResponseEntity<MealPlanResponse> addMealPlan(@Valid @RequestBody MealPlanRequest request) {
