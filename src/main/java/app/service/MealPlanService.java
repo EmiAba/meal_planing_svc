@@ -1,5 +1,7 @@
 package app.service;
 
+import app.exceptions.MealPlanNotFoundException;
+import app.exceptions.UnauthorizedAccessException;
 import app.model.MealPlan;
 import app.repository.MealPlanRepository;
 import app.web.dto.MealPlanRequest;
@@ -62,10 +64,10 @@ public class MealPlanService {
 
     public void deleteMealPlan(UUID mealPlanId, UUID userId) {
         MealPlan mealPlan = mealPlanRepository.findById(mealPlanId)
-                .orElseThrow(() -> new RuntimeException("Meal plan not found"));
+                .orElseThrow(() -> new MealPlanNotFoundException("Meal plan not found"));
 
         if (!mealPlan.getUserId().equals(userId)) {
-            throw new RuntimeException("You can only delete your own meal plans");
+            throw new UnauthorizedAccessException("You can only delete your own meal plans");
         }
 
         mealPlan.setDeleted(true);
