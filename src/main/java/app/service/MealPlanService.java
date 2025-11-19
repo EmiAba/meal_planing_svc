@@ -5,8 +5,6 @@ import app.exceptions.UnauthorizedAccessException;
 import app.model.MealPlan;
 import app.repository.MealPlanRepository;
 import app.web.dto.MealPlanRequest;
-import app.web.dto.MealPlanResponse;
-import app.web.mapper.MealPlanMapper;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
 
 
 @Slf4j
