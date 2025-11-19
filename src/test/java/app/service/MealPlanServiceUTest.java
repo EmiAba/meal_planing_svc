@@ -1,5 +1,6 @@
 package app.service;
 
+import app.exceptions.MealPlanNotFoundException;
 import app.exceptions.UnauthorizedAccessException;
 import app.model.MealPlan;
 import app.model.MealType;
@@ -117,7 +118,6 @@ public class MealPlanServiceUTest {
         MealPlan mealPlan = MealPlan.builder()
                 .id(mealPlanId)
                 .userId(ownerId)
-                .mealName("Breakfast Pizza")
                 .build();
 
         when(mealPlanRepository.findById(mealPlanId)).thenReturn(Optional.of(mealPlan));
@@ -128,5 +128,18 @@ public class MealPlanServiceUTest {
         verify(mealPlanRepository).save(mealPlan);
 
     }
+
+    @Test
+    public void whenDeleteNonExistingMealPlan_thenThrowException(){
+        UUID ownerId = UUID.randomUUID();
+        UUID mealPlanId = UUID.randomUUID();
+
+        when(mealPlanRepository.findById(mealPlanId)).thenReturn(Optional.empty());
+
+        assertThrows(MealPlanNotFoundException.class, () -> mealPlanService.deleteMealPlan(mealPlanId, ownerId));
+
+
+
+            }
 
 }
