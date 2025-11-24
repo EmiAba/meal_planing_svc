@@ -1,5 +1,6 @@
 package app.web;
 
+import app.exceptions.MealPlanNotFoundException;
 import app.model.MealPlan;
 import app.model.MealType;
 import app.service.MealPlanService;
@@ -19,8 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(MealPlanController.class)
@@ -93,6 +93,36 @@ public class MealPlanControllerApiTest {
     }
 
 
+    @Test
+    void deleteMealPlan_shouldReturn204() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UUID mealPlanId = UUID.randomUUID();
+
+        MockHttpServletRequestBuilder request = delete("/api/v1/meal-plans/" + mealPlanId)
+                .param("userId", userId.toString());
+
+        mockMvc.perform(request)
+                .andExpect(status().isNoContent());
+
+        verify(mealPlanService).deleteMealPlan(mealPlanId, userId);
+    }
+
+
+    @Test
+    void deleteMealPlan_whenNotFound_shouldReturn404() throws Exception {
+        UUID userId = UUID.randomUUID();
+        UUID mealPlanId = UUID.randomUUID();
+
+        doThrow(new MealPlanNotFoundException("Meal plan not found"))
+                .when(mealPlanService).deleteMealPlan(mealPlanId, userId);
+
+        mockMvc.perform(delete("/api/v1/meal-plans/" + mealPlanId)
+                        .param("userId", userId.toString()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Meal plan not found"));
+
+        verify(mealPlanService).deleteMealPlan(mealPlanId, userId);
+    }
 
 
     private MealPlan createMealPlan(UUID userId) {
