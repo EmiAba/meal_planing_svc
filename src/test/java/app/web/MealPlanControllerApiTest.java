@@ -82,6 +82,19 @@ public class MealPlanControllerApiTest {
     }
 
 
+    @Test
+    void addMealPlan_withInvalidData_shouldReturn400() throws Exception {
+        mockMvc.perform(post("/api/v1/meal-plans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                          .andExpect(status().isBadRequest());
+
+        verify(mealPlanService, never()).addMealPlan(any());
+    }
+
+
+
+
     private MealPlan createMealPlan(UUID userId) {
         return MealPlan.builder()
                 .id(UUID.randomUUID())
