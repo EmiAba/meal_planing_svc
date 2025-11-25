@@ -51,7 +51,15 @@ public class MealPlanControllerApiTest {
 
         mockMvc.perform(httpRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].userId").value(userId.toString()))
+                .andExpect(jsonPath("$[0].mealName").isNotEmpty())
+                .andExpect(jsonPath("$[0].mealType").isNotEmpty())
+                .andExpect(jsonPath("$[0].plannedDate").isNotEmpty())
+                .andExpect(jsonPath("$[0].calories").isNumber())
+                .andExpect(jsonPath("$[0].recipeId").exists());
 
         verify(mealPlanService, times(1)).getWeeklyMealPlans(userId, weekStart);
     }
@@ -62,7 +70,7 @@ public class MealPlanControllerApiTest {
                 .userId(UUID.randomUUID())
                 .mealName("Lunch")
                 .mealType(MealType.LUNCH)
-                .plannedDate(LocalDate.of(2025, 11, 24))
+                .plannedDate(LocalDate.now().plusDays(1))
                 .recipeId(UUID.randomUUID())
                 .calories(500)
                 .build();
@@ -76,7 +84,13 @@ public class MealPlanControllerApiTest {
                 .content(objectMapper.writeValueAsBytes(dto));
 
         mockMvc.perform(request)
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.userId").exists())
+                .andExpect(jsonPath("$.mealName").value("Lunch"))
+                .andExpect(jsonPath("$.mealType").value("LUNCH"))
+                .andExpect(jsonPath("$.calories").value(500));
+
 
         verify(mealPlanService).addMealPlan(any());
     }
@@ -87,11 +101,11 @@ public class MealPlanControllerApiTest {
         mockMvc.perform(post("/api/v1/meal-plans")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
-                          .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").exists());
 
         verify(mealPlanService, never()).addMealPlan(any());
     }
-
 
     @Test
     void deleteMealPlan_shouldReturn204() throws Exception {
@@ -118,6 +132,7 @@ public class MealPlanControllerApiTest {
 
         mockMvc.perform(delete("/api/v1/meal-plans/" + mealPlanId)
                         .param("userId", userId.toString()))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Meal plan not found"));
 
