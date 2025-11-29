@@ -5,7 +5,6 @@ import app.exceptions.UnauthorizedAccessException;
 import app.model.MealPlan;
 import app.repository.MealPlanRepository;
 import app.web.dto.MealPlanRequest;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ public class MealPlanService {
         this.mealPlanRepository = mealPlanRepository;
     }
 
-    public MealPlan addMealPlan(@Valid MealPlanRequest request) {
+    public MealPlan addMealPlan(MealPlanRequest request) {
 
 
         MealPlan mealPlan = MealPlan.builder()
