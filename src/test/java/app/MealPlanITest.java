@@ -39,10 +39,11 @@ public class MealPlanITest {
 
     @Test
     void mealPlanFullFlow_shouldWork() throws Exception {
+
         mealPlanRepository.deleteAll();
 
         UUID userId = UUID.randomUUID();
-        LocalDate weekStart = LocalDate.of(2025, 11, 24);
+        LocalDate weekStart = LocalDate.of(2026, 12, 15);
 
         MealPlanRequest request = MealPlanRequest.builder()
                 .userId(userId)
@@ -71,7 +72,7 @@ public class MealPlanITest {
 
         MealPlan saved = mealPlanRepository.findAll().get(0);
 
-        MockHttpServletRequestBuilder deleteRequest = delete("/api/v1/meal-plans/" + saved.getId())
+                MockHttpServletRequestBuilder deleteRequest = delete("/api/v1/meal-plans/" + saved.getId())
                 .param("userId", userId.toString());
 
         mockMvc.perform(deleteRequest)
